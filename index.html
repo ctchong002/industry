@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TPG 柔佛工厂配对 Industrial Finder</title>
+<meta name="description" content="柔佛工厂 / 仓库 / 工业地 / 店屋 盘源搜索 (Johor factory &amp; industrial listings)">
+<meta name="theme-color" content="#0f3d6e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="工厂配对">
+<style>
+:root{--b:#0f3d6e;--y:#f5b700;--bg:#f3f5f8;--c:#fff;--t:#1b2430;--m:#5d6b7c;--l:#dde3ea;--g:#128c4a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t)}
+header{background:var(--b);color:#fff;padding:12px 14px calc(10px);padding-top:max(12px,env(safe-area-inset-top))}
+header h1{margin:0;font-size:19px;line-height:1.25}
+header .sub{font-size:13px;opacity:.85;margin-top:3px}
+.bar{position:sticky;top:0;z-index:5;background:var(--b);padding:0 10px 10px;display:flex;gap:8px}
+.bar input{flex:1;min-width:0;font-size:16px;padding:11px 12px;border-radius:10px;border:0}
+.bar button{font-size:15px;padding:0 14px;border-radius:10px;border:0;background:var(--y);color:#222;font-weight:700;white-space:nowrap}
+#panel{background:var(--c);border-bottom:1px solid var(--l);padding:6px 12px 12px}
+#panel.hide{display:none}
+.row{margin-top:10px}
+.lab{font-size:13px;color:var(--m);margin-bottom:5px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--l);background:#f8fafc;border-radius:20px;padding:8px 13px;font-size:15px;min-height:40px;color:var(--t)}
+.chip.on{background:var(--b);color:#fff;border-color:var(--b)}
+.seg{display:flex;border:1px solid var(--b);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:10px 0;font-size:16px;color:var(--b);min-height:44px}
+.seg button.on{background:var(--b);color:#fff;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f{display:flex;flex-direction:column}
+.f span{font-size:12px;color:var(--m);margin-bottom:3px}
+.f input,.f select{font-size:16px;padding:9px 10px;border:1px solid var(--l);border-radius:9px;background:#fff;min-height:44px;width:100%}
+.acts{display:flex;gap:8px;margin-top:14px}
+.acts button{flex:1;min-height:46px;font-size:16px;border-radius:10px;border:1px solid var(--b);background:#fff;color:var(--b)}
+.acts button.pri{background:var(--b);color:#fff;font-weight:700}
+#info{padding:10px 14px 4px;font-size:14px;color:var(--m);display:flex;justify-content:space-between;align-items:center;gap:8px}
+#info select{font-size:15px;padding:6px;border-radius:8px;border:1px solid var(--l);background:#fff}
+#list{padding:4px 10px 30px}
+.card{background:var(--c);border-radius:12px;padding:12px 13px;margin:9px 0;box-shadow:0 1px 2px rgba(0,0,0,.06);border:1px solid #e8edf2}
+.card h3{margin:0 0 5px;font-size:16.5px;line-height:1.35}
+.spec{font-size:14.5px;color:#26313d;margin:3px 0}
+.price{font-weight:700;color:#a3360b}
+.ag{margin:7px 0 2px;font-size:15px}
+.ag a{color:var(--g);font-weight:700;text-decoration:none;padding:4px 0;display:inline-block}
+.small{font-size:13px;color:var(--m)}
+.tag{display:inline-block;background:#eef3f9;color:var(--b);border-radius:6px;padding:1px 7px;font-size:12.5px;margin-right:4px}
+.kf{display:inline-block;background:#fff4cc;color:#7a5a00;border-radius:6px;padding:0 6px;font-size:12.5px;margin-left:4px;font-weight:600}
+.oth{font-size:14px;margin-top:4px}
+.oth a{color:var(--g);text-decoration:none}
+details{margin-top:7px}
+summary{font-size:14px;color:var(--b);cursor:pointer;padding:6px 0}
+details pre{white-space:pre-wrap;word-break:break-word;font:13.5px/1.5 inherit;font-family:inherit;background:#f7f9fb;border-radius:8px;padding:9px;margin:4px 0 0;max-height:420px;overflow:auto}
+#more{display:block;width:calc(100% - 20px);margin:6px 10px 30px;min-height:48px;font-size:16px;border-radius:10px;border:1px solid var(--b);background:#fff;color:var(--b)}
+.empty{text-align:center;color:var(--m);padding:30px 10px}
+footer{font-size:12px;color:var(--m);text-align:center;padding:0 14px 30px}
+@media(min-width:760px){#list{max-width:820px;margin:0 auto}#panel>div{max-width:820px;margin:0 auto}header,.bar{padding-left:max(14px,calc(50% - 400px));padding-right:max(14px,calc(50% - 400px))}}
+</style>
+</head>
+<body>
+<header>
+  <h1>TPG 柔佛工厂配对 Industrial Finder</h1>
+  <div class="sub" id="cover">载入中… Loading…</div>
+</header>
+<div class="bar">
+  <input id="q" type="search" placeholder="关键字 keyword: crane, Senai, 角头…" enterkeyhint="search" autocomplete="off">
+  <button id="tog" type="button">筛选 ▾</button>
+</div>
+<div id="panel" class="hide"><div>
+  <div class="row"><div class="seg" id="sr">
+    <button data-v="" class="on">全部 All</button><button data-v="r">租 Rent</button><button data-v="s">卖 Sale</button>
+  </div></div>
+  <div class="row"><div class="lab">地区 Area（可多选）</div><div class="chips" id="areas"></div></div>
+  <div class="row"><div class="lab">类型 Type</div><div class="chips" id="types"></div></div>
+  <div class="row grid">
+    <label class="f"><span>电 最少 Min amp</span><input id="minAmp" type="number" inputmode="numeric" placeholder="例 300"></label>
+    <label class="f"><span>电 最多 Max amp</span><input id="maxAmp" type="number" inputmode="numeric"></label>
+    <label class="f"><span>建筑 最少 Min BU (sf)</span><input id="minBu" type="number" inputmode="numeric"></label>
+    <label class="f"><span>建筑 最多 Max BU (sf)</span><input id="maxBu" type="number" inputmode="numeric"></label>
+    <label class="f"><span>地 最少 Min land (sf)</span><input id="minLd" type="number" inputmode="numeric"></label>
+    <label class="f"><span>地 最多 Max land (sf)</span><input id="maxLd" type="number" inputmode="numeric"></label>
+    <label class="f"><span>楼高 最少 Min ceiling</span><input id="minCeil" type="number" inputmode="decimal"></label>
+    <label class="f"><span>楼高单位 Unit</span><select id="ceilU"><option value="ft">ft 尺</option><option value="m">m 米</option></select></label>
+    <label class="f"><span>载重 最少 Min loading (kN/m²)</span><input id="minFl" type="number" inputmode="numeric"></label>
+    <label class="f"><span>价钱 最高 Max RM（租=月租）</span><input id="maxP" type="number" inputmode="numeric" placeholder="例 50000"></label>
+    <label class="f"><span>工业类别 Industry</span><select id="ind"><option value="">不限 Any</option><option value="L">Light</option><option value="M">Medium</option><option value="H">Heavy</option></select></label>
+    <label class="f"><span>地契 Tenure</span><select id="ten"><option value="">不限 Any</option><option value="F">Freehold</option><option value="L">Leasehold</option></select></label>
+  </div>
+  <div class="row"><div class="lab">来源群 Group</div><div class="chips" id="groups"></div></div>
+  <div class="acts"><button type="button" id="reset">重设 Reset</button><button type="button" class="pri" id="go">看结果 Show</button></div>
+</div></div>
+<div id="info"><span id="cnt"></span>
+  <select id="sort" aria-label="排序 sort">
+    <option value="new">最新 Newest</option><option value="pa">价钱 低→高</option><option value="pd">价钱 高→低</option>
+    <option value="amp">电 Amp 高→低</option><option value="bu">建筑 BU 大→小</option>
+  </select></div>
+<div id="list"></div>
+<button id="more" type="button" hidden>显示更多 Show more</button>
+<footer>资料来自 WhatsApp 群组盘源，仅供参考，请向原 agent 核实。Listings from WhatsApp groups, verify with the agent.<br>The Pillars Group · CT Chong</footer>
+<script src="data.js"></script>
+<script>
+(function(){
+"use strict";
+var D=window.FDATA;
+if(!D){document.getElementById("cover").textContent="资料载入失败，请重新整理 / Data failed to load, please refresh";return;}
+var $=function(id){return document.getElementById(id)};
+var TYPES=[["D","独立式 Detached"],["S","半独立 Semi-D"],["C","Cluster"],["T","排屋 Terrace"],["W","仓库 Warehouse"],["F","工厂 Factory"],["L","地 Land"],["P","店屋 Shoplot"]];
+var TN={D:"Detached factory",S:"Semi-D factory",C:"Cluster factory",T:"Terrace factory",W:"Warehouse",F:"Factory",L:"Land",P:"Shoplot",O:"Open shed",X:"Data centre"};
+var IND={L:"Light industry",M:"Medium industry",H:"Heavy industry"},TEN={F:"Freehold",L:"Leasehold"};
+var G=D.meta.groups, GN=D.meta.groupNames;
+var SENAI_X=/i-?synergy|seelong|idaman|m-?park|airport city|ebp ?2|eco business park 2/i;
+var MON=["","1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+function dstr(s){return parseInt(s.slice(4,6),10)+"/"+parseInt(s.slice(2,4),10)+"/20"+s.slice(0,2)}
+function fmtN(n){return Math.round(n).toLocaleString("en-US")}
+function money(v){return v>=1e6?"RM"+(v/1e6).toFixed(v>=1e7?1:2).replace(/\.?0+$/,"")+"mil":"RM"+fmtN(v)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function gtags(mask){var o=[];for(var i=0;i<G.length;i++)if(mask&(1<<i))o.push(G[i]);return o}
+// precompute
+var districts={}, L=D.L;
+L.forEach(function(x){var ar=D.areas[x.a]||["?",""];x.area=ar[0];x.dist=ar[1]||ar[0];
+  x.senai=x.dist==="Senai"||SENAI_X.test(x.loc+" "+x.area);
+  x.gm=x.ag.reduce(function(m,a){return m|a[2]},0);
+  x.s=(x.area+" "+x.dist+" "+x.loc+" "+(TN[x.t]||"")+" "+x.kf+" "+x.txt+" "+x.ag.map(function(a){var g=D.agents[a[0]];return g[0]+" "+g[1]+" 0"+g[1].slice(2)}).join(" ")).toLowerCase();
+  if(x.dist&&x.dist!=="?")districts[x.dist]=(districts[x.dist]||0)+1;});
+var dlist=Object.keys(districts).sort(function(a,b){return districts[b]-districts[a]});
+$("cover").textContent="资料 "+dstr(D.meta.from.replace(/-/g,"").slice(2))+" – "+dstr(D.meta.to.replace(/-/g,"").slice(2))+" · 共 "+fmtN(D.meta.count)+" 个盘 listings · 更新 "+D.meta.built.slice(0,10);
+function chips(el,items,key){$(el).innerHTML=items.map(function(it){return '<button type="button" class="chip" data-v="'+esc(it[0])+'">'+esc(it[1])+'</button>'}).join("");
+  $(el).addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;b.classList.toggle("on");run()})}
+chips("areas",dlist.map(function(d){return [d,(d==="Senai"?"Senai+ 含Seelong/EBP2/M-Park/Idaman/I-Synergy":d)+" "+districts[d]]}));
+chips("types",TYPES);
+chips("groups",G.map(function(g){return [g,g+" · "+GN[g]]}));
+$("sr").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;[].forEach.call($("sr").children,function(c){c.classList.toggle("on",c===b)});run()});
+function on(el){return [].map.call($(el).querySelectorAll(".chip.on"),function(b){return b.dataset.v})}
+function num(id){var v=parseFloat($(id).value);return isNaN(v)?null:v}
+var NUMS=["minAmp","maxAmp","minBu","maxBu","minLd","maxLd","minCeil","minFl","maxP"],SELS=["ceilU","ind","ten","sort"];
+function state(){var s={q:$("q").value.trim(),sr:$("sr").querySelector(".on").dataset.v,ar:on("areas"),ty:on("types"),gr:on("groups")};
+  NUMS.forEach(function(k){s[k]=num(k)});SELS.forEach(function(k){s[k]=$(k).value});return s}
+function price(x,sr){if(sr==="r")return x.rent||0;if(sr==="s")return x.sale||0;return x.rent||x.sale||0}
+function match(x,s){
+  if(s.sr==="r"&&!(x.sr==="r"||x.sr==="b"||(!x.sr&&x.rent)))return false;
+  if(s.sr==="s"&&!(x.sr==="s"||x.sr==="b"||(!x.sr&&x.sale)))return false;
+  if(s.ar.length&&!s.ar.some(function(a){return a==="Senai"?x.senai:x.dist===a}))return false;
+  if(s.ty.length&&s.ty.indexOf(x.t)<0)return false;
+  if(s.gr.length&&!s.gr.some(function(g){return x.gm&(1<<G.indexOf(g))}))return false;
+  if(s.minAmp!=null&&!(x.amp>=s.minAmp))return false;
+  if(s.maxAmp!=null&&!(x.amp&&x.amp<=s.maxAmp))return false;
+  if(s.minBu!=null&&!(x.bu>=s.minBu))return false;
+  if(s.maxBu!=null&&!(x.bu&&x.bu<=s.maxBu))return false;
+  if(s.minLd!=null&&!(x.ld>=s.minLd))return false;
+  if(s.maxLd!=null&&!(x.ld&&x.ld<=s.maxLd))return false;
+  if(s.minCeil!=null){var c=s.ceilU==="m"?x.cm:(x.cf||x.cm*3.281);if(!(c>=s.minCeil-0.05))return false}
+  if(s.minFl!=null&&!(x.fl>=s.minFl))return false;
+  if(s.maxP!=null){var p=price(x,s.sr);if(!(p&&p<=s.maxP))return false}
+  if(s.ind&&x.ind!==s.ind)return false;
+  if(s.ten&&x.ten!==s.ten)return false;
+  if(s.q){var ws=s.q.toLowerCase().split(/\s+/);for(var i=0;i<ws.length;i++){var w=ws[i];if(/^0\d{8,}$/.test(w))w="6"+w;if(x.s.indexOf(w)<0)return false}}
+  return true}
+var res=[],shown=0,PAGE=30;
+function srt(s){var k=s.sort;res.sort(function(a,b){
+  if(k==="pa"||k==="pd"){var pa=price(a,s.sr),pb=price(b,s.sr);if(!pa)return 1;if(!pb)return -1;return k==="pa"?pa-pb:pb-pa}
+  if(k==="amp")return (b.amp||0)-(a.amp||0)||(b.last>a.last?1:-1);
+  if(k==="bu")return (b.bu||0)-(a.bu||0)||(b.last>a.last?1:-1);
+  return b.last>a.last?1:b.last<a.last?-1:0})}
+function agLink(a,x,label){var g=D.agents[a[0]],nm=g[0]||("0"+g[1].slice(2))||"?",ph=g[1];
+  if(!ph)return '<b>'+esc(nm)+'</b>';
+  var msg="Hi "+(g[0]||"")+", 请问这个盘还有吗？"+label+" (TPG 工厂配对)";
+  return '<a href="https://wa.me/'+ph+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'+esc(nm)+' 0'+ph.slice(2).replace(/^(1\d)(\d{3,4})(\d{4})$/,"$1-$2 $3")+'</a>'}
+function card(x,i,s){
+  var srT=x.sr==="r"?"出租 Rent":x.sr==="s"?"出售 Sale":x.sr==="b"?"租/卖 Rent & Sale":"";
+  var lc=x.loc&&[x.area,x.dist].map(function(z){return (z||"").toLowerCase()}).indexOf(x.loc.toLowerCase())<0?x.loc:"";
+  var place=x.area+(x.dist&&x.dist!==x.area?" ("+x.dist+")":"")+(lc?" · "+lc:"");
+  var title=(i+1)+". "+place+" · "+(TN[x.t]||"Factory")+(srT?" · "+srT:"");
+  var sp=[];
+  sp.push("BU "+(x.bu?fmtN(x.bu)+"sf":"-"));
+  sp.push("地 "+(x.ld?fmtN(x.ld)+"sf"+(x.ld>=21780?" ("+(x.ld/43560).toFixed(2).replace(/\.?0+$/,"")+"ac)":""):"-"));
+  sp.push(x.amp?x.amp+"A":"电 -");
+  sp.push("楼高 "+(x.cm?(+x.cm.toFixed(1))+"m"+(x.cf?"/"+Math.round(x.cf)+"ft":""):"-"));
+  if(x.fl)sp.push("载重 "+x.fl+"kN/m²");
+  if(x.ind)sp.push(IND[x.ind]);
+  if(x.ten)sp.push(TEN[x.ten]);
+  var pr=[];
+  if(x.rent)pr.push("租 "+money(x.rent)+"/月"+(x.psf&&x.sr!=="s"&&x.psf<=20?" (RM"+x.psf+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+(x.rent/x.bu).toFixed(2)+"psf)":"")));
+  if(x.sale)pr.push("卖 "+money(x.sale)+(x.psf&&x.psf>20?" (RM"+fmtN(x.psf)+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+fmtN(x.sale/x.bu)+"psf BU)":x.ld?" (≈RM"+(x.sale/x.ld).toFixed(1)+"psf 地)":"")));
+  var label=x.area+" "+(TN[x.t]||"")+(x.bu?" BU "+fmtN(x.bu)+"sf":"")+(x.amp?" "+x.amp+"A":"")+(x.rent?" 租"+money(x.rent):x.sale?" 卖"+money(x.sale):"");
+  var f=x.ag[0], oth=x.ag.slice(1);
+  var h='<div class="card"><h3>'+esc(title)+(x.kf?'<span class="kf">'+esc(x.kf)+'</span>':'')+'</h3>'+
+    '<div class="spec">'+esc(sp.join(" | "))+'</div>'+
+    '<div class="spec price">'+esc(pr.join(" | ")||"价钱 请问 agent")+'</div>'+
+    '<div class="ag">👉 '+agLink(f,x,label)+' <span class="small">首发 '+dstr(f[1])+'</span></div>'+
+    '<div class="small">📍 '+gtags(x.gm).map(function(g){return '<span class="tag" title="'+esc(GN[g])+'">'+esc(g)+'</span>'}).join("")+' 最近 '+dstr(x.last)+'</div>';
+  if(oth.length){h+='<div class="oth">也有人发：'+oth.slice(0,6).map(function(a){return agLink(a,x,label)+' <span class="small">('+gtags(a[2]).join("/")+')</span>'}).join("，")+
+    (oth.length>6?'<details><summary>还有 '+(oth.length-6)+' 位 agent</summary>'+oth.slice(6).map(function(a){return agLink(a,x,label)+' <span class="small">('+gtags(a[2]).join("/")+')</span>'}).join("，")+'</details>':'')+'</div>'}
+  h+='<details><summary>原文 Original message ▾</summary><pre>'+esc(x.txt)+'</pre></details></div>';
+  return h}
+function render(more){var s=state(),h="";var end=Math.min(res.length,shown+PAGE);
+  for(var i=shown;i<end;i++)h+=card(res[i],i,s);
+  if(more)$("list").insertAdjacentHTML("beforeend",h);else $("list").innerHTML=h||'<div class="empty">没有符合的盘 No match.<br>试试放宽条件（很多盘没写电/楼高/载重，有这些条件会被筛掉）。</div>';
+  shown=end;$("more").hidden=shown>=res.length}
+var tmr;
+function run(){var s=state();res=L.filter(function(x){return match(x,s)});srt(s);shown=0;
+  $("cnt").textContent="找到 "+fmtN(res.length)+" 个盘";render(false);save(s)}
+function save(s){var p=[];if(s.q)p.push("q="+encodeURIComponent(s.q));if(s.sr)p.push("sr="+s.sr);
+  ["ar","ty","gr"].forEach(function(k){if(s[k].length)p.push(k+"="+encodeURIComponent(s[k].join(",")))});
+  NUMS.forEach(function(k){if(s[k]!=null)p.push(k+"="+s[k])});SELS.forEach(function(k){var d=$(k).options[0].value;if(s[k]!==d)p.push(k+"="+s[k])});
+  history.replaceState(null,"",p.length?"#"+p.join("&"):location.pathname+location.search)}
+function load(){var h=location.hash.slice(1);if(!h)return;h.split("&").forEach(function(kv){var i=kv.indexOf("="),k=kv.slice(0,i),v=decodeURIComponent(kv.slice(i+1));
+  if(k==="q")$("q").value=v;else if(k==="sr")[].forEach.call($("sr").children,function(c){c.classList.toggle("on",c.dataset.v===v)});
+  else if(k==="ar"||k==="ty"||k==="gr"){var el={ar:"areas",ty:"types",gr:"groups"}[k],vs=v.split(",");[].forEach.call($(el).children,function(c){if(vs.indexOf(c.dataset.v)>=0)c.classList.add("on")})}
+  else if($(k))$(k).value=v});}
+$("q").addEventListener("input",function(){clearTimeout(tmr);tmr=setTimeout(run,200)});
+$("q").addEventListener("keydown",function(e){if(e.key==="Enter"){$("q").blur();run()}});
+NUMS.concat(["ceilU","ind","ten"]).forEach(function(k){$(k).addEventListener("input",function(){clearTimeout(tmr);tmr=setTimeout(run,300)})});
+$("sort").addEventListener("change",run);
+$("tog").addEventListener("click",function(){var p=$("panel");p.classList.toggle("hide");$("tog").textContent=p.classList.contains("hide")?"筛选 ▾":"收起 ▴"});
+$("go").addEventListener("click",function(){$("panel").classList.add("hide");$("tog").textContent="筛选 ▾";run();window.scrollTo({top:0,behavior:"smooth"})});
+$("reset").addEventListener("click",function(){$("q").value="";NUMS.forEach(function(k){$(k).value=""});SELS.forEach(function(k){$(k).selectedIndex=0});
+  document.querySelectorAll(".chip.on").forEach(function(c){c.classList.remove("on")});[].forEach.call($("sr").children,function(c,i){c.classList.toggle("on",i===0)});run()});
+$("more").addEventListener("click",function(){render(true)});
+load();run();
+if(location.hash.length>1)$("panel").classList.remove("hide"),$("tog").textContent="收起 ▴";
+})();
+</script>
+</body>
+</html>
