@@ -170,7 +170,7 @@ function srt(s){var k=s.sort;res.sort(function(a,b){
   return b.last>a.last?1:b.last<a.last?-1:0})}
 function agLink(a,x,label){var g=D.agents[a[0]],nm=g[0]||("0"+g[1].slice(2))||"?",ph=g[1];
   if(!ph)return '<b>'+esc(nm)+'</b>';
-  var msg="Hi "+(g[0]||"")+", 请问这个盘还有吗？"+label+" (TPG 工厂配对)";
+  var msg="Hi "+(g[0]||"")+", 请问这个盘还有吗？"+label;
   return '<a href="https://wa.me/'+ph+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">'+esc(nm)+' 0'+ph.slice(2).replace(/^(1\d)(\d{3,4})(\d{4})$/,"$1-$2 $3")+'</a>'}
 function card(x,i,s){
   var srT=x.sr==="r"?"出租 Rent":x.sr==="s"?"出售 Sale":x.sr==="b"?"租/卖 Rent & Sale":"";
