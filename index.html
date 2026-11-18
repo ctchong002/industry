@@ -188,6 +188,7 @@ function card(x,i,s){
   var pr=[];
   if(x.rent)pr.push("租 "+money(x.rent)+"/月"+(x.psf&&x.sr!=="s"&&x.psf<=20?" (RM"+x.psf+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+(x.rent/x.bu).toFixed(2)+"psf)":"")));
   if(x.sale)pr.push("卖 "+money(x.sale)+(x.psf&&x.psf>20?" (RM"+fmtN(x.psf)+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+fmtN(x.sale/x.bu)+"psf BU)":x.ld?" (≈RM"+(x.sale/x.ld).toFixed(1)+"psf 地)":"")));
+  if(x.tr&&x.sale)pr.push(x.tn==="t"?"已有租客 · 租金 RM"+fmtN(x.tr)+"/月":"原文另写租金 RM"+fmtN(x.tr)+"/月");
   var label=x.area+" "+(TN[x.t]||"")+(x.bu?" BU "+fmtN(x.bu)+"sf":"")+(x.amp?" "+x.amp+"A":"")+(x.rent?" 租"+money(x.rent):x.sale?" 卖"+money(x.sale):"");
   var f=x.ag[0], oth=x.ag.slice(1);
   var h='<div class="card"><h3>'+esc(title)+(x.kf?'<span class="kf">'+esc(x.kf)+'</span>':'')+'</h3>'+
