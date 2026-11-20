@@ -111,8 +111,8 @@ footer{font-size:12px;color:var(--m);text-align:center;padding:0 14px 30px}
 var D=window.FDATA;
 if(!D){document.getElementById("cover").textContent="资料载入失败，请重新整理 / Data failed to load, please refresh";return;}
 var $=function(id){return document.getElementById(id)};
-var TYPES=[["D","独立式 Detached"],["S","半独立 Semi-D"],["C","Cluster"],["T","排屋 Terrace"],["W","仓库 Warehouse"],["F","工厂 Factory"],["L","地 Land"],["P","店屋 Shoplot"]];
-var TN={D:"Detached factory",S:"Semi-D factory",C:"Cluster factory",T:"Terrace factory",W:"Warehouse",F:"Factory",L:"Land",P:"Shoplot",O:"Open shed",X:"Data centre"};
+var TYPES=[["D","独立式 Detached"],["S","半独立 Semi-D"],["C","Cluster"],["T","排屋 Terrace"],["W","仓库 Warehouse"],["F","工厂 Factory"],["L","地 Land"],["P","店屋 Shoplot"],["B","生意出顶 Takeover"]];
+var TN={D:"Detached factory",S:"Semi-D factory",C:"Cluster factory",T:"Terrace factory",W:"Warehouse",F:"Factory",L:"Land",P:"Shoplot",B:"生意出顶 Business takeover",O:"Open shed",X:"Data centre"};
 var IND={L:"Light industry",M:"Medium industry",H:"Heavy industry"},TEN={F:"Freehold",L:"Leasehold"};
 var G=D.meta.groups, GN=D.meta.groupNames;
 var SENAI_X=/i-?synergy|seelong|idaman|m-?park|airport city|ebp ?2|eco business park 2/i;
@@ -186,8 +186,10 @@ function card(x,i,s){
   if(x.ind)sp.push(IND[x.ind]);
   if(x.ten)sp.push(TEN[x.ten]);
   var pr=[];
-  if(x.rent)pr.push("租 "+money(x.rent)+"/月"+(x.psf&&x.sr!=="s"&&x.psf<=20?" (RM"+x.psf+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+(x.rent/x.bu).toFixed(2)+"psf)":"")));
+  if(x.rent&&x.rf)pr.push("租 "+money(x.rent)+"/月 (楼层价 per floor)");
+  else if(x.rent)pr.push("租 "+money(x.rent)+"/月"+(x.psf&&x.sr!=="s"&&x.psf<=20?" (RM"+x.psf+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+(x.rent/x.bu).toFixed(2)+"psf)":"")));
   if(x.sale)pr.push("卖 "+money(x.sale)+(x.psf&&x.psf>20?" (RM"+fmtN(x.psf)+"psf)":(x.bu&&x.t!=="L"?" (≈RM"+fmtN(x.sale/x.bu)+"psf BU)":x.ld?" (≈RM"+(x.sale/x.ld).toFixed(1)+"psf 地)":"")));
+  if(x.tf)pr.push("顶手费 "+money(x.tf)+(x.tsr?" · 店租 RM"+fmtN(x.tsr)+"/月":""));
   if(x.tr&&x.sale)pr.push(x.tn==="t"?"已有租客 · 租金 RM"+fmtN(x.tr)+"/月":"原文另写租金 RM"+fmtN(x.tr)+"/月");
   var label=x.area+" "+(TN[x.t]||"")+(x.bu?" BU "+fmtN(x.bu)+"sf":"")+(x.amp?" "+x.amp+"A":"")+(x.rent?" 租"+money(x.rent):x.sale?" 卖"+money(x.sale):"");
   var f=x.ag[0], oth=x.ag.slice(1);
