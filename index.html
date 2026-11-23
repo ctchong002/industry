@@ -124,10 +124,12 @@ function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&am
 function gtags(mask){var o=[];for(var i=0;i<G.length;i++)if(mask&(1<<i))o.push(G[i]);return o}
 // precompute
 var districts={}, L=D.L;
-L.forEach(function(x){var ar=D.areas[x.a]||["?",""];x.area=ar[0];x.dist=ar[1]||ar[0];
+L.forEach(function(x){var ar=D.areas[x.a]||["?",""];x.area=ar[0];x.dist=ar[1]||ar[0];x.par=ar[2]||"";
   x.senai=x.dist==="Senai"||SENAI_X.test(x.loc+" "+x.area);
   x.gm=x.ag.reduce(function(m,a){return m|a[2]},0);
-  x.s=(x.area+" "+x.dist+" "+x.loc+" "+(TN[x.t]||"")+" "+x.kf+" "+x.txt+" "+x.ag.map(function(a){var g=D.agents[a[0]];return g[0]+" "+g[1]+" 0"+g[1].slice(2)}).join(" ")).toLowerCase();
+  // keyword search: area / district / project / title / specs only, never the full original text (CT 11/23: a 'Nusa Cemerlang'
+  // in a connectivity paragraph must not make a SiLC unit show up for 'cemerlang')
+  x.s=(x.area+" "+x.dist+" "+x.par+" "+x.loc+" "+(x.kw||"")+" "+(TN[x.t]||"")+" "+x.kf+" "+({L:"light industrial",M:"medium industrial",H:"heavy industrial"}[x.ind]||"")+" "+({F:"freehold",L:"leasehold"}[x.ten]||"")+" "+x.ag.map(function(a){var g=D.agents[a[0]];return g[0]+" "+g[1]+" 0"+g[1].slice(2)}).join(" ")).toLowerCase().replace(/\s+/g," ");
   if(x.dist&&x.dist!=="?")districts[x.dist]=(districts[x.dist]||0)+1;});
 var dlist=Object.keys(districts).sort(function(a,b){return districts[b]-districts[a]});
 $("cover").textContent="资料 "+dstr(D.meta.from.replace(/-/g,"").slice(2))+" – "+dstr(D.meta.to.replace(/-/g,"").slice(2))+" · 共 "+fmtN(D.meta.count)+" 个盘 listings · 更新 "+D.meta.built.slice(0,10);
@@ -160,7 +162,8 @@ function match(x,s){
   if(s.maxP!=null){var p=price(x,s.sr);if(!(p&&p<=s.maxP))return false}
   if(s.ind&&x.ind!==s.ind)return false;
   if(s.ten&&x.ten!==s.ten)return false;
-  if(s.q){var ws=s.q.toLowerCase().split(/\s+/);for(var i=0;i<ws.length;i++){var w=ws[i];if(/^0\d{8,}$/.test(w))w="6"+w;if(x.s.indexOf(w)<0)return false}}
+  if(s.q&&s.ph){if(x.s.indexOf(s.ph)<0)return false}
+  else if(s.q){var ws=s.q.toLowerCase().split(/\s+/);for(var i=0;i<ws.length;i++){var w=ws[i];if(/^0\d{8,}$/.test(w))w="6"+w;if(x.s.indexOf(w)<0)return false}}
   return true}
 var res=[],shown=0,PAGE=30;
 function srt(s){var k=s.sort;res.sort(function(a,b){
@@ -207,7 +210,10 @@ function render(more){var s=state(),h="";var end=Math.min(res.length,shown+PAGE)
   if(more)$("list").insertAdjacentHTML("beforeend",h);else $("list").innerHTML=h||'<div class="empty">没有符合的盘 No match.<br>试试放宽条件（很多盘没写电/楼高/载重，有这些条件会被筛掉）。</div>';
   shown=end;$("more").hidden=shown>=res.length}
 var tmr;
-function run(){var s=state();res=L.filter(function(x){return match(x,s)});srt(s);shown=0;
+function run(){var s=state();
+  // several words: if some listing has them as one phrase ('desa cemerlang', 'setia business park 1'), match the phrase only
+  var ph=s.q.toLowerCase().replace(/\s+/g," ");s.ph=(ph.indexOf(" ")>0&&L.some(function(x){return x.s.indexOf(ph)>=0}))?ph:"";
+  res=L.filter(function(x){return match(x,s)});srt(s);shown=0;
   $("cnt").textContent="找到 "+fmtN(res.length)+" 个盘";render(false);save(s)}
 function save(s){var p=[];if(s.q)p.push("q="+encodeURIComponent(s.q));if(s.sr)p.push("sr="+s.sr);
   ["ar","ty","gr"].forEach(function(k){if(s[k].length)p.push(k+"="+encodeURIComponent(s[k].join(",")))});
