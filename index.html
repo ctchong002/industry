@@ -6,9 +6,9 @@
 <title>TPG 柔佛工厂配对 Industrial Finder</title>
 <meta name="description" content="柔佛工厂 / 仓库 / 工业地 / 店屋 盘源搜索 (Johor factory &amp; industrial listings)">
 <meta name="theme-color" content="#0f3d6e">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="工厂配对">
@@ -32,6 +32,10 @@ header .sub{font-size:13px;opacity:.85;margin-top:3px}
 .seg{display:flex;border:1px solid var(--b);border-radius:10px;overflow:hidden}
 .seg button{flex:1;border:0;background:#fff;padding:10px 0;font-size:16px;color:var(--b);min-height:44px}
 .seg button.on{background:var(--b);color:#fff;font-weight:700}
+#cat{margin:8px 12px 0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b)}
+#cat button:first-child{grid-column:1/-1}
+#cat button{font-size:15px;line-height:1.2;padding:7px 0}
+#cat small{display:block;font-size:12px;font-weight:400;opacity:.85}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .f{display:flex;flex-direction:column}
 .f span{font-size:12px;color:var(--m);margin-bottom:3px}
@@ -73,12 +77,13 @@ footer{font-size:12px;color:var(--m);text-align:center;padding:0 14px 30px}
   <input id="q" type="search" placeholder="关键字 keyword: crane, Senai, 角头…" enterkeyhint="search" autocomplete="off">
   <button id="tog" type="button">筛选 ▾</button>
 </div>
+<div class="seg" id="cat"><button data-v="" class="on">全部 All<small id="cA"></small></button><button data-v="I">🏭 工业 Industry<small id="cI"></small></button><button data-v="C">🏬 商业 Commercial<small id="cC"></small></button><button data-v="L">🟫 地皮 Land<small id="cL"></small></button><button data-v="B">🤝 生意出顶 Business Take Over<small id="cB"></small></button></div>
 <div id="panel" class="hide"><div>
   <div class="row"><div class="seg" id="sr">
     <button data-v="" class="on">全部 All</button><button data-v="r">租 Rent</button><button data-v="s">卖 Sale</button>
   </div></div>
   <div class="row"><div class="lab">地区 Area（可多选）</div><div class="chips" id="areas"></div></div>
-  <div class="row"><div class="lab">类型 Type</div><div class="chips" id="types"></div></div>
+  <div class="chips" id="types" hidden></div>
   <div class="row grid">
     <label class="f"><span>电 最少 Min amp</span><input id="minAmp" type="number" inputmode="numeric" placeholder="例 300"></label>
     <label class="f"><span>电 最多 Max amp</span><input id="maxAmp" type="number" inputmode="numeric"></label>
@@ -111,8 +116,8 @@ footer{font-size:12px;color:var(--m);text-align:center;padding:0 14px 30px}
 var D=window.FDATA;
 if(!D){document.getElementById("cover").textContent="资料载入失败，请重新整理 / Data failed to load, please refresh";return;}
 var $=function(id){return document.getElementById(id)};
-var TYPES=[["D","独立式 Detached"],["S","半独立 Semi-D"],["C","Cluster"],["T","排屋 Terrace"],["W","仓库 Warehouse"],["F","工厂 Factory"],["L","地 Land"],["P","店屋 Shoplot"],["B","生意出顶 Takeover"]];
-var TN={D:"Detached factory",S:"Semi-D factory",C:"Cluster factory",T:"Terrace factory",W:"Warehouse",F:"Factory",L:"Land",P:"Shoplot",B:"生意出顶 Business takeover",O:"Open shed",X:"Data centre"};
+var TYPES=[["D","独立式 Detached"],["S","半独立 Semi-D"],["C","Cluster"],["T","排屋 Terrace"],["W","仓库 Warehouse"],["F","工厂 Factory"],["L","地皮 Land"],["P","店屋 Shoplot"],["K","商业楼 Commercial bldg"],["E","办公室 Office"],["H","宿舍 Hostel"],["B","生意出顶 Takeover"],["O","Open shed"],["X","Data centre"]];
+var TN={D:"Detached factory",S:"Semi-D factory",C:"Cluster factory",T:"Terrace factory",W:"Warehouse",F:"Factory",L:"Land",P:"Shoplot",B:"生意出顶 Business takeover",E:"Office 办公室",K:"Commercial building 商业楼",H:"Hostel 宿舍",O:"Open shed",X:"Data centre"};
 var IND={L:"Light industry",M:"Medium industry",H:"Heavy industry"},TEN={F:"Freehold",L:"Leasehold"};
 var G=D.meta.groups, GN=D.meta.groupNames;
 var SENAI_X=/i-?synergy|seelong|idaman|m-?park|airport city|ebp ?2|eco business park 2/i;
@@ -136,19 +141,31 @@ $("cover").textContent="资料 "+dstr(D.meta.from.replace(/-/g,"").slice(2))+" �
 function chips(el,items,key){$(el).innerHTML=items.map(function(it){return '<button type="button" class="chip" data-v="'+esc(it[0])+'">'+esc(it[1])+'</button>'}).join("");
   $(el).addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;b.classList.toggle("on");run()})}
 chips("areas",dlist.map(function(d){return [d,(d==="Senai"?"Senai+ 含Seelong/EBP2/M-Park/Idaman/I-Synergy":d)+" "+districts[d]]}));
-chips("types",TYPES);
+// CT 23/11: one site, three categories. Every type code belongs to exactly one category.
+var CAT={D:"I",S:"I",C:"I",T:"I",W:"I",F:"I",O:"I",X:"I",P:"C",B:"B",E:"C",H:"C",K:"C",L:"L"};
+var CN={I:0,C:0,L:0,B:0};L.forEach(function(x){x.cat=CAT[x.t]||"I";CN[x.cat]++});
+function srN(arr){var s=0,r=0;arr.forEach(function(x){if(x.sr==="s"||x.sr==="b"||(!x.sr&&x.sale))s++;if(x.sr==="r"||x.sr==="b"||(!x.sr&&x.rent))r++});return "卖 "+s+" · 租 "+r}
+$("cA").textContent=fmtN(L.length)+" · "+srN(L);$("cB").textContent=fmtN(CN.B)+" · 顶让 takeover";
+["I","C","L"].forEach(function(k){$("c"+k).textContent=fmtN(CN[k])+" · "+srN(L.filter(function(x){return x.cat===k}))});
+// the type chips show only the subtypes of the chosen category, each with its count
+function typeChips(cat){return;var tc={};L.forEach(function(x){if(!cat||x.cat===cat)tc[x.t]=(tc[x.t]||0)+1});
+  $("types").innerHTML=TYPES.filter(function(t){return tc[t[0]]}).map(function(t){return '<button type="button" class="chip" data-v="'+esc(t[0])+'">'+esc(t[1])+" "+tc[t[0]]+'</button>'}).join("")}
+$("types").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;b.classList.toggle("on");run()});
+typeChips("");
+$("cat").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;[].forEach.call($("cat").children,function(c){c.classList.toggle("on",c===b)});typeChips(b.dataset.v);run()});
 chips("groups",G.map(function(g){return [g,g+" · "+GN[g]]}));
 $("sr").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;[].forEach.call($("sr").children,function(c){c.classList.toggle("on",c===b)});run()});
 function on(el){return [].map.call($(el).querySelectorAll(".chip.on"),function(b){return b.dataset.v})}
 function num(id){var v=parseFloat($(id).value);return isNaN(v)?null:v}
 var NUMS=["minAmp","maxAmp","minBu","maxBu","minLd","maxLd","minCeil","minFl","maxP"],SELS=["ceilU","ind","ten","sort"];
-function state(){var s={q:$("q").value.trim(),sr:$("sr").querySelector(".on").dataset.v,ar:on("areas"),ty:on("types"),gr:on("groups")};
+function state(){var s={cat:$("cat").querySelector(".on").dataset.v,q:$("q").value.trim(),sr:$("sr").querySelector(".on").dataset.v,ar:on("areas"),ty:on("types"),gr:on("groups")};
   NUMS.forEach(function(k){s[k]=num(k)});SELS.forEach(function(k){s[k]=$(k).value});return s}
 function price(x,sr){if(sr==="r")return x.rent||0;if(sr==="s")return x.sale||0;return x.rent||x.sale||0}
 function match(x,s){
-  if(s.sr==="r"&&!(x.sr==="r"||x.sr==="b"||(!x.sr&&x.rent)))return false;
-  if(s.sr==="s"&&!(x.sr==="s"||x.sr==="b"||(!x.sr&&x.sale)))return false;
+  if(x.cat!=="B"&&s.sr==="r"&&!(x.sr==="r"||x.sr==="b"||(!x.sr&&x.rent)))return false;
+  if(x.cat!=="B"&&s.sr==="s"&&!(x.sr==="s"||x.sr==="b"||(!x.sr&&x.sale)))return false;
   if(s.ar.length&&!s.ar.some(function(a){return a==="Senai"?x.senai:x.dist===a}))return false;
+  if(s.cat&&x.cat!==s.cat)return false;
   if(s.ty.length&&s.ty.indexOf(x.t)<0)return false;
   if(s.gr.length&&!s.gr.some(function(g){return x.gm&(1<<G.indexOf(g))}))return false;
   if(s.minAmp!=null&&!(x.amp>=s.minAmp))return false;
