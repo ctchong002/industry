@@ -27,6 +27,9 @@ header .sub{font-size:13px;opacity:.85;margin-top:3px}
 .row{margin-top:10px}
 .lab{font-size:13px;color:var(--m);margin-bottom:5px;font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips.col{display:none}
+.artog{display:block;width:100%;text-align:left;background:none;border:1px solid var(--l);border-radius:8px;margin-bottom:5px;padding:8px 10px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;color:var(--m)}
+.artog.act{color:var(--b);border-color:var(--b)}
 .chip{border:1px solid var(--l);background:#f8fafc;border-radius:20px;padding:8px 13px;font-size:15px;min-height:40px;color:var(--t)}
 .chip.on{background:var(--b);color:#fff;border-color:var(--b)}
 .seg{display:flex;border:1px solid var(--b);border-radius:10px;overflow:hidden}
@@ -82,7 +85,7 @@ footer{font-size:12px;color:var(--m);text-align:center;padding:0 14px 30px}
   <div class="row"><div class="seg" id="sr">
     <button data-v="" class="on">全部 All</button><button data-v="r">租 Rent</button><button data-v="s">卖 Sale</button>
   </div></div>
-  <div class="row"><div class="lab">地区 Area（可多选）</div><div class="chips" id="areas"></div></div>
+  <div class="row"><button type="button" class="lab artog" id="arTog" aria-expanded="false">地区 Area（可多选）▼</button><div class="chips col" id="areas"></div></div>
   <div class="chips" id="types" hidden></div>
   <div class="row grid">
     <label class="f"><span>电 最少 Min amp</span><input id="minAmp" type="number" inputmode="numeric" placeholder="例 300"></label>
@@ -231,7 +234,12 @@ function render(more){var s=state(),h="";var end=Math.min(res.length,shown+PAGE)
   if(more)$("list").insertAdjacentHTML("beforeend",h);else $("list").innerHTML=h||'<div class="empty">没有符合的盘 No match.<br>试试放宽条件（很多盘没写电/楼高/载重，有这些条件会被筛掉）。</div>';
   shown=end;$("more").hidden=shown>=res.length}
 var tmr;
-function run(){var s=state();
+// CT 24/11: the area chips are collapsed by default; tap the header to open / close. The header shows the chosen areas.
+function arLab(){var a=on("areas"),open=!$("areas").classList.contains("col"),t="地区 Area（可多选）";
+  if(a.length)t+="："+(a.length<=3?a.join("、"):a.slice(0,3).join("、")+" 等 "+a.length+" 个");
+  $("arTog").textContent=t+(open?" ▲":" ▼");$("arTog").classList.toggle("act",a.length>0);$("arTog").setAttribute("aria-expanded",open)}
+$("arTog").addEventListener("click",function(){$("areas").classList.toggle("col");arLab()});
+function run(){var s=state();arLab();
   // several words: if some listing has them as one phrase ('desa cemerlang', 'setia business park 1'), match the phrase only
   var ph=s.q.toLowerCase().replace(/\s+/g," ");s.ph=(ph.indexOf(" ")>0&&L.some(function(x){return x.s.indexOf(ph)>=0}))?ph:"";
   res=L.filter(function(x){return match(x,s)});srt(s);shown=0;
